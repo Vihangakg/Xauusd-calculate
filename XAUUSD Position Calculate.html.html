@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XAUUSD Position Size Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        
+        .input-group:hover {
+            transform: translateY(-2px);
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .result-card {
+            background: linear-gradient(135deg, #f6f9fc 0%, #ffffff 100%);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .result-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .result-card .value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .result-card .unit {
+            color: #888;
+            font-size: 0.9em;
+        }
+        
+        .profit .value {
+            color: #10b981;
+        }
+        
+        .loss .value {
+            color: #ef4444;
+        }
+        
+        .warning {
+            background: #fef3cd;
+            border: 1px solid #ffd60a;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+            color: #856404;
+        }
+        
+        @media (max-width: 768px) {
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏅 XAUUSD Position Calculator</h1>
+            <p>Professional Trading Position Size Calculator</p>
+        </div>
+        
+        <div class="input-section">
+            <div class="input-group">
+                <label for="accountBalance">Account Balance ($)</label>
+                <input type="number" id="accountBalance" placeholder="5000" value="5000" step="0.01">
+            </div>
+            
+            <div class="input-group">
+                <label for="riskPercent">Risk Percentage (%)</label>
+                <input type="number" id="riskPercent" placeholder="1" value="1" step="0.1">
+            </div>
+            
+            <div class="input-group">
+                <label for="entryPrice">Entry Price ($)</label>
+                <input type="number" id="entryPrice" placeholder="2650.50" step="0.01">
+            </div>
+            
+            <div class="input-group">
+                <label for="slPrice">Stop Loss Price ($)</label>
+                <input type="number" id="slPrice" placeholder="2640.00" step="0.01">
+            </div>
+            
+            <div class="input-group">
+                <label for="tpPrice">Take Profit Price ($)</label>
+                <input type="number" id="tpPrice" placeholder="2680.00" step="0.01">
+            </div>
+            
+            <div class="input-group">
+                <label for="tradeType">Trade Type</label>
+                <select id="tradeType">
+                    <option value="buy">Buy (Long)</option>
+                    <option value="sell">Sell (Short)</option>
+                </select>
+            </div>
+        </div>
+        
+        <button class="calculate-btn" onclick="calculatePosition()">Calculate Position Size</button>
+        
+        <div class="results" id="results" style="display: none;">
+            <div class="result-card">
+                <h3>Position Size</h3>
+                <div class="value" id="positionSize">0.00</div>
+                <div class="unit">Lots</div>
+            </div>
+            
+            <div class="result-card">
+                <h3>Contract Size</h3>
+                <div class="value" id="contractSize">0.00</div>
+                <div class="unit">Ounces</div>
+            </div>
+            
+            <div class="result-card">
+                <h3>Risk Amount</h3>
+                <div class="value" id="riskAmount">$0.00</div>
+                <div class="unit">Maximum Loss</div>
+            </div>
+            
+            <div class="result-card">
+                <h3>Risk-Reward Ratio</h3>
+                <div class="value" id="rrRatio">1:0</div>
+                <div class="unit">R:R</div>
+            </div>
+            
+            <div class="result-card profit">
+                <h3>Potential Profit</h3>
+                <div class="value" id="potentialProfit">$0.00</div>
+                <div class="unit">If TP Hit</div>
+            </div>
+            
+            <div class="result-card loss">
+                <h3>Potential Loss</h3>
+                <div class="value" id="potentialLoss">-$0.00</div>
+                <div class="unit">If SL Hit</div>
+            </div>
+        </div>
+        
+        <div class="warning" id="warning" style="display: none;">
+            <strong>⚠ Warning:</strong> <span id="warningText"></span>
+        </div>
+    </div>
+
+    <script>
+        function calculatePosition() {
+            // Get input values
+            const accountBalance = parseFloat(document.getElementById('accountBalance').value) || 0;
+            const riskPercent = parseFloat(document.getElementById('riskPercent').value) || 0;
+            const entryPrice = parseFloat(document.getElementById('entryPrice').value) || 0;
+            const slPrice = parseFloat(document.getElementById('slPrice').value) || 0;
+            const tpPrice = parseFloat(document.getElementById('tpPrice').value) || 0;
+            const tradeType = document.getElementById('tradeType').value;
+            
+            // Validation
+            if (!accountBalance || !riskPercent || !entryPrice || !slPrice || !tpPrice) {
+                showWarning('Please fill in all fields with valid numbers');
+                return;
+            }
+            
+            // Calculate risk amount
+            const riskAmount = accountBalance * (riskPercent / 100);
+            
+            // Calculate pip/point difference for SL and TP
+            let slDifference, tpDifference;
+            
+            if (tradeType === 'buy') {
+                slDifference = entryPrice - slPrice; // Should be positive for buy
+                tpDifference = tpPrice - entryPrice; // Should be positive for buy
+                
+                if (slDifference <= 0) {
+                    showWarning('For BUY trades, Stop Loss should be below Entry Price');
+                    return;
+                }
+                if (tpDifference <= 0) {
+                    showWarning('For BUY trades, Take Profit should be above Entry Price');
+                    return;
+                }
+            } else {
+                slDifference = slPrice - entryPrice; // Should be positive for sell
+                tpDifference = entryPrice - tpPrice; // Should be positive for sell
+                
+                if (slDifference <= 0) {
+                    showWarning('For SELL trades, Stop Loss should be above Entry Price');
+                    return;
+                }
+                if (tpDifference <= 0) {
+                    showWarning('For SELL trades, Take Profit should be below Entry Price');
+                    return;
+                }
+            }
+            
+            // XAUUSD: 1 lot = 100 ounces, 1 pip = $1 per 0.1 lots
+            // For gold, 1 lot = 100 ounces, so $1 move = $100 per lot
+            const dollarPerLotPerDollar = 100; // $100 per lot per $1 move in gold price
+            
+            // Calculate position size in lots
+            const positionSize = riskAmount / (slDifference * dollarPerLotPerDollar);
+            const contractSize = positionSize * 100; // Convert to ounces
+            
+            // Calculate potential profit/loss
+            const potentialProfit = tpDifference * dollarPerLotPerDollar * positionSize;
+            const potentialLoss = riskAmount; // This is the maximum loss (our SL)
+            
+            // Calculate Risk-Reward ratio
+            const rrRatio = potentialProfit / potentialLoss;
+            
+            // Display results
+            document.getElementById('positionSize').textContent = positionSize.toFixed(2);
+            document.getElementById('contractSize').textContent = contractSize.toFixed(2);
+            document.getElementById('riskAmount').textContent = '$' + riskAmount.toFixed(2);
+            document.getElementById('rrRatio').textContent = '1:' + rrRatio.toFixed(2);
+            document.getElementById('potentialProfit').textContent = '$' + potentialProfit.toFixed(2);
+            document.getElementById('potentialLoss').textContent = '-$' + potentialLoss.toFixed(2);
+            
+            // Show results
+            document.getElementById('results').style.display = 'grid';
+            hideWarning();
+            
+            // Show warning for high risk
+            if (riskPercent > 5) {
+                showWarning('Risk percentage above 5% is considered very high. Consider reducing your risk.');
+            } else if (rrRatio < 1) {
+                showWarning('Risk-Reward ratio is less than 1:1. Consider adjusting your TP/SL levels.');
+            }
+        }
+        
+        function showWarning(message) {
+            document.getElementById('warningText').textContent = message;
+            document.getElementById('warning').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+        }
+        
+        function hideWarning() {
+            document.getElementById('warning').style.display = 'none';
+        }
+        
+        // Add event listener for Enter key
+        document.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                calculatePosition();
+            }
+        });
+        
+        // Auto-calculate when values change
+        const inputs = document.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.value && 
+                    document.getElementById('entryPrice').value && 
+                    document.getElementById('slPrice').value && 
+                    document.getElementById('tpPrice').value) {
+                    setTimeout(calculatePosition, 500);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
